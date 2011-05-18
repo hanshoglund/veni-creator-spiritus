@@ -31,16 +31,27 @@ play.states = [["Play"], ["Stop"]];
 
 
 
-{PlayBuf.ar(1, ~buf)!2}.play
+{PlayBuf.ar(1, ~buf)!4}.play
 (
-{TGrains.ar(
+{Out.ar(2, TGrains.ar(
 	2, 
 	bufnum: ~buf, 
 	trigger: MouseButton.kr(lag:0),
 	centerPos: MouseX.kr * 190,
 	dur: 4,
 	rate: MouseY.kr * 0.1 + 1 // must be subtle...
-)}.play
+))}.play
 )
 
 Bus.audio(s)
+Klank     
+Quarks.gui
+Random      
+
+
+
+
+// MIDI
+
+
+CCResponder.new{|src, chan, num, val| [src, chan, num, val].postln}

@@ -58,13 +58,36 @@ Veni : Project {
     // Create midi responder
     
     midiResponder = CCResponder.new { |src, chan, num, val| 
-      [src, chan, num, val].postln;
+      
+/*      [src, chan, num, val].postln;*/
+      
       AppClock.sched(0, {
-        switch(num, 
+        switch(num,     
+          // dens, dur, rate
           41, {bufferWindow.dens.value = val / 127.0},
           42, {bufferWindow.dur.value = val / 127.0},
           43, {bufferWindow.rate.value = val / 127.0},
-          94, {bufferWindow.play.value = val / 127}
+          
+          // play button
+          94, {bufferWindow.play.value = val / 127},
+          
+          // pos widgets
+          21, {posWindow.widgets[0].gain.value = val / 127.0},
+          22, {posWindow.widgets[1].gain.value = val / 127.0},
+          23, {posWindow.widgets[2].gain.value = val / 127.0},
+          24, {posWindow.widgets[3].gain.value = val / 127.0},
+          25, {posWindow.widgets[4].gain.value = val / 127.0},
+          26, {posWindow.widgets[5].gain.value = val / 127.0},
+          27, {posWindow.widgets[6].gain.value = val / 127.0},
+          28, {posWindow.widgets[7].gain.value = val / 127.0},
+          31, {posWindow.widgets[0].feedback.value = val / 127.0},
+          32, {posWindow.widgets[1].feedback.value = val / 127.0},
+          33, {posWindow.widgets[2].feedback.value = val / 127.0},
+          34, {posWindow.widgets[3].feedback.value = val / 127.0},
+          35, {posWindow.widgets[4].feedback.value = val / 127.0},
+          36, {posWindow.widgets[5].feedback.value = val / 127.0},
+          37, {posWindow.widgets[6].feedback.value = val / 127.0},
+          38, {posWindow.widgets[7].feedback.value = val / 127.0}
         );        
       });
     };

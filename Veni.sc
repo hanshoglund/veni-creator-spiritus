@@ -1,31 +1,54 @@
-
-
-Veni : Project {
-
-  classvar fileName  = "/Users/hans/Documents/Media/Projects/Veni/veniMono.wav";
-  classvar numParts  = 12;
-  classvar numOutput = 8;
-
-  var <>server;
-  var <>file;
-  var <>buffer;
-  var <>midiResponder;
+/* 
+    Grainer and spacial feedback player for 'Veni Creator Spiritus'
+    Copyright (c) Hans Höglund 2011 
+   
+    Requirements:
+        SuperCollider > 3.1
+        Project class by Hans Höglund
+        Cocoa, qt or swing GUI
+        
+    Usage:
+        alt 1) Run SuperCollider application
+               Choose Projects > Veni 
+        alt 2) ./sclang
+               Veni.initProject(Veni)
                
+    Output:
+        2D ambisonic through this.field
+        Decoded ambisonic is written to (outputOffset..outputOffset+numOutput)
+*/
+Veni : Project {
+  
+  classvar <fileName     = "/Users/hans/Documents/Media/Projects/Veni/veniMono.wav";
+  classvar <numParts     = 12;              
+  classvar <outputOffset = 2;
+  classvar <numOutput    = 8;
+
+  var <server;
+  var <file;
+  var <buffer;
+  var <midiResponder;
+               
+  /* Global control buses */
   var densBus;
   var durBus;
   var rateBus;
   var selectOffBus;     
   var selectLenBus;
-
-  var field;
-  var parts;
   
-  // GUI
+  /* VeniPart instances to generate the sound */
+  var parts;                                    
+  
+  /* Ambisonic sound field on the form [w, x, y] where w etc are buses*/
+  var <field;
+  
+  /* GUI */
   var <posWindow;
   var <bufferWindow;
-  
+
+
   init {      
-    server = Server.default;
+    server = server ? Server.default;
 
     file = SoundFile.new;
     file.openRead(fileName);                
@@ -38,15 +61,28 @@ Veni : Project {
     selectOffBus = Bus.control(server);     
     selectLenBus = Bus.control(server);
 
-    field = Bus.audio(server, 3);
-
+    field = Bus.audio(server, numChannels: 3);
 
     server.waitForBoot {
-      // TODO create parts         
-    
-      // Create decoder       
-//      var #[w, x, y] = In.ar(field);
-//      {DecodeB2.ar(numOutput, w, x, y)}.play;
+      {
+        parts = [];
+        numParts.do { parts.add(VeniPart.new(this)) };
+      }.value;
+        
+      {
+/*        var fieldIndices = (0..2).collect(_ + field.index);*/
+
+        {
+          Out.ar(16, PanB2.ar(Impulse.ar(4, 0, 0.8), MouseX.kr, MouseY.kr));
+        }.play;
+        
+        {             
+          Out.ar(2, DecodeB2.ar(4, In.ar(16), In.ar(17), In.ar(18)));
+        }.play;
+      }.value;
+
+
+
     };
     
     // Create GUI
@@ -59,8 +95,10 @@ Veni : Project {
     
     midiResponder = CCResponder.new { |src, chan, num, val| 
       
-/*      [src, chan, num, val].postln;*/
-      
+//      [src, chan, num, val].postln;
+
+      // TODO update bus
+
       AppClock.sched(0, {
         switch(num,     
           // dens, dur, rate
@@ -92,12 +130,10 @@ Veni : Project {
       });
     };
   }
-  
-  
 }
 
 VeniPart {
-
+     
   var thBus;
   var rhBus;       
   var gainBus;
@@ -109,21 +145,21 @@ VeniPart {
   
   var outputBus;
   
-  *new {
-    ^super.new.init;
+  *new { |veni|
+    ^super.new.init(veni);
   }
   
-  init {
-    thBus       = Bus.control(Veni.server);
-    rhBus       = Bus.control(Veni.server);       
-    gainBus     = Bus.control(Veni.server);
-    feedbackBus = Bus.control(Veni.server); 
+  init { |veni|
+    thBus       = Bus.control(veni.server);
+    rhBus       = Bus.control(veni.server);       
+    gainBus     = Bus.control(veni.server);
+    feedbackBus = Bus.control(veni.server); 
 
 //    granulator = TGrains
 //    filter = Klank
 //    panner = PanB2
 
-    outputBus   = Bus.audio(Veni.server);
+    outputBus   = Bus.audio(veni.server);
   }
 
 }

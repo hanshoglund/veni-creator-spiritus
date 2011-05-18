@@ -59,7 +59,7 @@ VeniBufferWindow {
     rate   = NumberBox     . new(window, Rect(150, 95, 50, 20));
     play   = Button        . new(window, Rect(10, 120, 100, 20));
 
-    sf.openRead("/Users/hans/Documents/Media/Projects/Veni/veniMono.wav");
+    sf.openRead(Veni.fileName);
     sfv.soundfile = sf;
     sfv.gridOn = false;
     sfv.readWithTask;

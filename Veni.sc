@@ -57,11 +57,10 @@ Veni : Project {
   init {
 
     server = server ? Server.default;
-
-    file = SoundFile.new;
-    file.openRead(fileName);
-
+    file   = SoundFile.new;
     buffer = Buffer.read(server, path: fileName);
+
+    file.openRead(fileName);
 
     densBus      = Bus.control(server);
     durBus       = Bus.control(server);
@@ -71,11 +70,11 @@ Veni : Project {
 
     field = Bus.audio(server, numChannels: 4);
 
-    // Setup server and parts
-
     server.waitForBoot {
         parts = List[];
-        numParts.do { parts.add(VeniPart.new(this)) };
+        numParts.do { 
+          parts.add(VeniPart.new(this))
+        };
 
         SynthDef.new(\test, {
           var p = Impulse.ar(2);
@@ -99,23 +98,18 @@ Veni : Project {
         partGroup   = Group.head(server);
         outputGroup = Group.tail(server);
 
+        // TODO should be sent lazily on the first play instead
         SystemClock.sched(0.5, {
 //          Synth.new(\test, target:partGroup);
           Synth.new(\decoder, target: outputGroup);
         });
     };
 
-    // Create GUI
-
     partWindow = VeniPartWindow.new(this);
     bufferWindow = VeniBufferWindow.new(this);
 
 
-    // Create MIDI responder
-
     midiResponder = CCResponder.new { |src, chan, num, val|
-
-//      [src, chan, num, val].postln;
 
       switch(num,
         41, {densBus.value = val / 127.0},
@@ -178,7 +172,6 @@ Veni : Project {
   
   play {     
     if (playing == false) { 
-      "play".postln;
       parts.collect(_.play) 
     };
     playing = true;
@@ -187,7 +180,6 @@ Veni : Project {
   
   stop {
     if (playing == true) { 
-      "stop".postln;
       parts.collect(_.stop);
     };
     playing = false;
@@ -196,24 +188,23 @@ Veni : Project {
 }
 
 VeniPart {
+          
+  var veni;
 
   /* Part-specific control buses */
   var <xBus;
   var <yBus;
   var <gainBus;
   var <feedbackBus;
+  
+  var synth;
 
-  var player;
-  var filter;
-  var panner;
-
-  var <outputBus;
-
-  *new { |veni|
-    ^super.new.init(veni);
+  *new { |v|
+    ^super.new.init(v);
   }
 
-  init { |veni|
+  init { |v|
+    veni        = v;
     xBus        = Bus.control(veni.server);
     yBus        = Bus.control(veni.server);
     gainBus     = Bus.control(veni.server);
@@ -223,11 +214,10 @@ VeniPart {
 //    filter = Klank
 //    panner = PanB2
 
-    outputBus   = Bus.audio(veni.server);
   }  
   
   play {
-    
+this.postln;
     
   } 
   

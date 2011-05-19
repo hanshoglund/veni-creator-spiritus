@@ -6,10 +6,10 @@ VeniPartWindow {
   var window;
   var <widgets;
 
-  *new { | v |
+  *new { |v|
     ^super.new.init(v);
   }
-  init { | v |
+  init { |v|
     veni = v;
   }
 
@@ -89,10 +89,10 @@ VeniBufferWindow {
   var <rate;
   var <play;
 
-  *new { | v |
+  *new { |v|
     ^super.new.init(v);
   }
-  init { | v |
+  init { |v|
     veni = v;
   }
 

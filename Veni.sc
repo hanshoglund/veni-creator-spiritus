@@ -46,6 +46,7 @@ Veni : Project {
 
   var <parts;
   var <field;
+  var <mono;
 
   /* GUI */
   var <partWindow;
@@ -68,6 +69,7 @@ Veni : Project {
     selectLenBus = Bus.control(server);
 
     field = Bus.audio(server, numChannels: 4);
+    mono  = Bus.audio(server);
 
     server.waitForBoot {
 
@@ -223,19 +225,13 @@ VeniPart {
         	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
         );                                  
       
-      var feedback = {  
-        var w, x, y, z;
-        #w, x, y, z = InFeedback.ar(veni.field, 4);
-        DecodeB2.ar(1, w, x, y);
-      }.value;        
+      var feedback =
+        DelayL.ar(InFeedback.ar(veni.mono), 0.2 + (0.3.rand), 0.5);
 
-/*      var filteredFeedback = 
-        Klang.ar(
-          Ref([[20+200.rand, 200+2000.rand, 2000+7000.rand], 0.5!3, 20.rand!3]), 
-          feedback);  */
-        
+      var filteredFeedback = HPF.ar(LPF.ar(feedback, 500), 100);
+          
       var signal = (player[0] * gainBus.kr) 
-        + (feedback * 0.2 * feedbackBus.kr);
+        + (filteredFeedback * feedbackBus.kr * 0.2);
         
       var panner = BFEncode2.ar(
         signal,
@@ -244,7 +240,7 @@ VeniPart {
         0,
         0.7
       );  
-//      Out.ar(2, player)
+      Out.ar(veni.mono, signal);
       Out.ar(veni.field, panner)
     }.asSynthDef;
 

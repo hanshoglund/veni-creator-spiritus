@@ -221,9 +221,14 @@ VeniPart {
         	centerPos: WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
         	dur:       (veni.durBus.kr * 10) + 0.2,
         	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
-        );
+        );                                  
+        
+        
+        
+        var signal = player[0] * gainBus.kr;
+        
         var panner = BFEncode2.ar(
-          player[0],
+          signal,
           xBus.kr,
           yBus.kr,
           0,

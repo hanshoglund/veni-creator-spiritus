@@ -62,18 +62,18 @@ Veni : Project {
 
     file.openRead(fileName);
 
-    densBus      = Bus.control(server);
-    durBus       = Bus.control(server);
-    rateBus      = Bus.control(server);
-    selectOffBus = Bus.control(server);
-    selectLenBus = Bus.control(server);
-
-    field = Bus.audio(server, numChannels: 4);
-    mono  = Bus.audio(server);
-
     server.waitForBoot {
 
         buffer = Buffer.read(server, path: fileName);
+
+        densBus      = Bus.control(server);
+        durBus       = Bus.control(server);
+        rateBus      = Bus.control(server);
+        selectOffBus = Bus.control(server);
+        selectLenBus = Bus.control(server);
+
+        field = Bus.audio(server, numChannels: 4);
+        mono  = Bus.audio(server);
 
         parts = List[];
         numParts.do {
@@ -219,9 +219,9 @@ VeniPart {
       var player = TGrains.ar(
         	2,
         	bufnum:    veni.buffer,
-        	trigger:   LFNoise1.kr(4 * veni.densBus.kr + 0.05),
+        	trigger:   LFNoise1.kr(4 * veni.densBus.kr + 0.04),
         	centerPos: WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
-        	dur:       (veni.durBus.kr * 10) + 0.2,
+        	dur:       (veni.durBus.kr * 13) + 0.08,
         	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
         );                                  
       

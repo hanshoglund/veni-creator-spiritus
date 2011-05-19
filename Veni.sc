@@ -58,7 +58,6 @@ Veni : Project {
 
     server = server ? Server.default;
     file   = SoundFile.new;
-    buffer = Buffer.read(server, path: fileName);
 
     file.openRead(fileName);
 
@@ -71,6 +70,9 @@ Veni : Project {
     field = Bus.audio(server, numChannels: 4);
 
     server.waitForBoot {
+
+        buffer = Buffer.read(server, path: fileName);
+
         parts = List[];
         numParts.do { 
           parts.add(VeniPart.new(this))
@@ -216,30 +218,37 @@ VeniPart {
 
   
   makeSynthGraph {
-    var player = TGrains.ar(
-    	numChannels: 2, 
-    	bufnum:      veni.buffer, 
-    	trigger:     LFNoise1.kr(0.005 * veni.densBus.kr),
-    	centerPos:   WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
-    	dur:         veni.durBus.kr + 1.5 * 10,
-    	rate:        1.0 // TODO
-    );
-    
+/*    var player = TGrains.ar(
+      numChannels: 2, 
+      bufnum:      veni.buffer, 
+      trigger:     LFNoise1.kr(0.5 * veni.densBus.kr),
+      centerPos:   WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
+      dur:         veni.durBus.kr + 1.5 * 10,
+      rate:        1.0 // TODO
+    );      
+        
     var panner = BFEncode2.ar(
       player[0], 
       xBus.kr, 
       yBus.kr, 
       0, 
       0.7
-    );
-//player.postln;
-//panner.postln; 
-    ^{Out.ar(veni.field, panner)}.asSynthDef;
+    );  
+*/
+
+    ^{Out.ar(2, TGrains.ar(
+    	2, 
+    	bufnum:    veni.buffer, 
+    	trigger:   LFNoise1.kr(4 * veni.densBus.kr),
+    	centerPos: WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
+    	dur:       4,
+    	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
+    ))}.asSynthDef;
+/*    ^{Out.ar(veni.field, panner)}.asSynthDef;*/
   }
   
   
   play {
-this.postln;
     synth = Synth.new(synthDef.name, target: veni.partGroup);
   } 
   

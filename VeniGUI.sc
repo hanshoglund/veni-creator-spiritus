@@ -1,4 +1,4 @@
-VeniPosWindow { 
+VeniPartWindow { 
   classvar <x = 4;
   classvar <y = 2;
   
@@ -11,8 +11,8 @@ VeniPosWindow {
     
     y.do { |y|
       x.do { |x|
-        var w = VeniPosWidget.new(window);
-        w.draw([x, y]);
+        var w = VeniPartWidget.new(window, [x, y]);
+        w.draw;
         widgets.add(w);
       }
     };      
@@ -20,27 +20,29 @@ VeniPosWindow {
   
 }
 
-VeniPosWidget {
-  var <>window;
+VeniPartWidget {
+  var <window;
+  var <offset;
   var <id; 
   
   var <pos;
   var <gain;
   var <feedback; 
   
-  *new { |window|
-    ^super.new.init(window);
+  *new { |window, offset=#[0,0]|
+    ^super.new.init(window, offset);
   }
   
-  init { |window|
-    this.window = window;
+  init { |w, o|
+    window = w;
+    offset = o;
   } 
   
-  draw { | offset=#[0,0] |
+  draw {
     pos      = Slider2D . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 15,  200, 200));
     gain     = Slider   . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 225, 200, 16));
     feedback = Slider   . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 245, 200, 16));
-    id       = offset[0] + (offset[1] * VeniPosWindow.x);
+    id       = offset[0] + (offset[1] * VeniPartWindow.x);
   }  
 }             
 

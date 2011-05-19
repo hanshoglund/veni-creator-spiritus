@@ -48,7 +48,7 @@ Veni : Project {
   var <field;
   
   /* GUI */
-  var <posWindow;
+  var <partWindow;
   var <bufferWindow;
 
 
@@ -103,7 +103,7 @@ Veni : Project {
     
     // Create GUI
 
-    posWindow = VeniPosWindow.new.show;
+    partWindow = VeniPartWindow.new.show;
     bufferWindow = VeniBufferWindow.new.show;
     
     
@@ -127,22 +127,22 @@ Veni : Project {
           94, {bufferWindow.play.value = val / 127},
           
           // pos widgets
-          21, {posWindow.widgets[0].gain.value = val / 127.0},
-          22, {posWindow.widgets[1].gain.value = val / 127.0},
-          23, {posWindow.widgets[2].gain.value = val / 127.0},
-          24, {posWindow.widgets[3].gain.value = val / 127.0},
-          25, {posWindow.widgets[4].gain.value = val / 127.0},
-          26, {posWindow.widgets[5].gain.value = val / 127.0},
-          27, {posWindow.widgets[6].gain.value = val / 127.0},
-          28, {posWindow.widgets[7].gain.value = val / 127.0},
-          31, {posWindow.widgets[0].feedback.value = val / 127.0},
-          32, {posWindow.widgets[1].feedback.value = val / 127.0},
-          33, {posWindow.widgets[2].feedback.value = val / 127.0},
-          34, {posWindow.widgets[3].feedback.value = val / 127.0},
-          35, {posWindow.widgets[4].feedback.value = val / 127.0},
-          36, {posWindow.widgets[5].feedback.value = val / 127.0},
-          37, {posWindow.widgets[6].feedback.value = val / 127.0},
-          38, {posWindow.widgets[7].feedback.value = val / 127.0}
+          21, {partWindow.widgets[0].gain.value = val / 127.0},
+          22, {partWindow.widgets[1].gain.value = val / 127.0},
+          23, {partWindow.widgets[2].gain.value = val / 127.0},
+          24, {partWindow.widgets[3].gain.value = val / 127.0},
+          25, {partWindow.widgets[4].gain.value = val / 127.0},
+          26, {partWindow.widgets[5].gain.value = val / 127.0},
+          27, {partWindow.widgets[6].gain.value = val / 127.0},
+          28, {partWindow.widgets[7].gain.value = val / 127.0},
+          31, {partWindow.widgets[0].feedback.value = val / 127.0},
+          32, {partWindow.widgets[1].feedback.value = val / 127.0},
+          33, {partWindow.widgets[2].feedback.value = val / 127.0},
+          34, {partWindow.widgets[3].feedback.value = val / 127.0},
+          35, {partWindow.widgets[4].feedback.value = val / 127.0},
+          36, {partWindow.widgets[5].feedback.value = val / 127.0},
+          37, {partWindow.widgets[6].feedback.value = val / 127.0},
+          38, {partWindow.widgets[7].feedback.value = val / 127.0}
         );        
       });
     };

@@ -68,10 +68,10 @@ VeniBufferWindow {
     
     // TODO sfv actions
     // TODO update actions
-    dens.action = {|c| c.value.postln};
-    dur.action  = {|c| c.value.postln};
-    rate.action = {|c| c.value.postln};
-    play.action = {|c| switch (c.value, 0, {}, 1, {})};
+//    dens.action = {|c| c.value.postln};
+//    dur.action  = {|c| c.value.postln};
+//    rate.action = {|c| c.value.postln};
+//    play.action = {|c| switch (c.value, 0, {}, 1, {})};
     
     play.states = [["Play"], ["Stop"]];
   }

@@ -17,12 +17,14 @@
         2D ambisonic through this.field
         Decoded ambisonic is written to (outputOffset..outputOffset+numOutput)
 */
+
 Veni : Project {
   
   classvar <fileName     = "/Users/hans/Documents/Media/Projects/Veni/veniMono.wav";
   classvar <numParts     = 12;              
   classvar <outputOffset = 2;
-  classvar <numOutput    = 8;
+  classvar <numSpeakers  = 6;
+  classvar <speakerDistance = 2.3;
 
   var <server;
   var <file;
@@ -36,10 +38,10 @@ Veni : Project {
   var selectOffBus;     
   var selectLenBus;
   
-  /* VeniPart instances to generate the sound */
-  var parts;                                    
+  var partGroup;                                   
+  var outputGroup;
   
-  /* Ambisonic sound field on the form [w, x, y] where w etc are buses*/
+  var <parts;  
   var <field;
   
   /* GUI */
@@ -48,11 +50,12 @@ Veni : Project {
 
 
   init {      
-    server = server ? Server.default;
-
-    file = SoundFile.new;
-    file.openRead(fileName);                
     
+    server = server ? Server.default;
+    
+    file = SoundFile.new;
+    file.openRead(fileName);         
+           
     buffer = Buffer.read(server, path: fileName);
 
     densBus      = Bus.control(server);
@@ -61,28 +64,38 @@ Veni : Project {
     selectOffBus = Bus.control(server);     
     selectLenBus = Bus.control(server);
 
-    field = Bus.audio(server, numChannels: 3);
+    field = Bus.audio(server, numChannels: 4);
 
     server.waitForBoot {
-      {
         parts = [];
         numParts.do { parts.add(VeniPart.new(this)) };
-      }.value;
+                           
+        SynthDef.new(\test, { 
+          var p = Impulse.ar(2);      
+          Out.ar(field, BFEncode2.ar(p, MouseX.kr(-1,1), MouseY.kr(1,-1), 0, 0.7));
+        }).add.send(server);
+
+        SynthDef.new(\decoder, {          
+          var w, x, y, z;                  
+          var speakers;
+
+          #w, x, y, z = In.ar(field, 4);   
+          speakers = BFDecode1.ar1(w, x, y, z,
+            (0..numSpeakers-1).collect(_*2+1).collect(_*pi/numSpeakers), 
+            0pi,
+            speakerDistance,
+            speakerDistance!numSpeakers,
+            0);
+          Out.ar(outputOffset, speakers);          
+        }).add.send(server);
         
-      {
-/*        var fieldIndices = (0..2).collect(_ + field.index);*/
+        partGroup   = Group.head(server);
+        outputGroup = Group.tail(server);
 
-        {
-          Out.ar(16, PanB2.ar(Impulse.ar(4, 0, 0.8), MouseX.kr, MouseY.kr));
-        }.play;
-        
-        {             
-          Out.ar(2, DecodeB2.ar(4, In.ar(16), In.ar(17), In.ar(18)));
-        }.play;
-      }.value;
-
-
-
+        SystemClock.sched(0.5, {
+          Synth.new(\test, target:partGroup);
+          Synth.new(\decoder, target: outputGroup);
+        });
     };
     
     // Create GUI
@@ -98,6 +111,7 @@ Veni : Project {
 //      [src, chan, num, val].postln;
 
       // TODO update bus
+      
 
       AppClock.sched(0, {
         switch(num,     
@@ -134,8 +148,9 @@ Veni : Project {
 
 VeniPart {
      
-  var thBus;
-  var rhBus;       
+  /* Part-specific control buses */
+  var xBus;
+  var yBus;       
   var gainBus;
   var feedbackBus; 
 
@@ -150,8 +165,8 @@ VeniPart {
   }
   
   init { |veni|
-    thBus       = Bus.control(veni.server);
-    rhBus       = Bus.control(veni.server);       
+    xBus        = Bus.control(veni.server);
+    yBus        = Bus.control(veni.server);       
     gainBus     = Bus.control(veni.server);
     feedbackBus = Bus.control(veni.server); 
 

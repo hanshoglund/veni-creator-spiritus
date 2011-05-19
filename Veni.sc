@@ -5,6 +5,7 @@
     Requirements:
         SuperCollider > 3.1
         Project class by Hans Höglund
+        SC3-Plugins
         Cocoa, qt or swing GUI
         
     Usage:
@@ -20,11 +21,13 @@
 
 Veni : Project {
   
+  /* Setup */
   classvar <fileName     = "/Users/hans/Documents/Media/Projects/Veni/veniMono.wav";
-  classvar <numParts     = 12;              
+  classvar <numParts     = 8;              
   classvar <outputOffset = 2;
   classvar <numSpeakers  = 6;
   classvar <speakerDistance = 2.3;
+
 
   var <server;
   var <file;
@@ -67,7 +70,7 @@ Veni : Project {
     field = Bus.audio(server, numChannels: 4);
 
     server.waitForBoot {
-        parts = [];
+        parts = List[];
         numParts.do { parts.add(VeniPart.new(this)) };
                            
         SynthDef.new(\test, { 
@@ -149,16 +152,16 @@ Veni : Project {
 VeniPart {
      
   /* Part-specific control buses */
-  var xBus;
-  var yBus;       
-  var gainBus;
-  var feedbackBus; 
+  var <xBus;
+  var <yBus;       
+  var <gainBus;
+  var <feedbackBus; 
 
-  var granulator;  
+  var player;  
   var filter;
   var panner;
   
-  var outputBus;
+  var <outputBus;
   
   *new { |veni|
     ^super.new.init(veni);

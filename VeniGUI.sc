@@ -11,8 +11,7 @@ VeniPosWindow {
     
     y.do { |y|
       x.do { |x|
-        var w = VeniPosWidget.new;
-        w.window = window;
+        var w = VeniPosWidget.new(window);
         w.draw([x, y]);
         widgets.add(w);
       }
@@ -27,7 +26,15 @@ VeniPosWidget {
   
   var <pos;
   var <gain;
-  var <feedback;  
+  var <feedback; 
+  
+  *new { |window|
+    ^super.new.init(window);
+  }
+  
+  init { |window|
+    this.window = window;
+  } 
   
   draw { | offset=#[0,0] |
     pos      = Slider2D . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 15,  200, 200));

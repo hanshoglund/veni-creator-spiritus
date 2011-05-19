@@ -3,7 +3,7 @@ VeniPartWindow {
   classvar <y = 2;
   
   var window;
-  var <>widgets;
+  var <widgets;
   
   show {
     window = Window.new("",Rect(500, 300, 890, 550)).front;
@@ -24,6 +24,7 @@ VeniPartWidget {
   var <window;
   var <offset;
   var <id; 
+  var <part;
   
   var <pos;
   var <gain;
@@ -36,14 +37,18 @@ VeniPartWidget {
   init { |w, o|
     window = w;
     offset = o;
+    id     = this.calculateId;
   } 
   
   draw {
     pos      = Slider2D . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 15,  200, 200));
     gain     = Slider   . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 225, 200, 16));
     feedback = Slider   . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 245, 200, 16));
-    id       = offset[0] + (offset[1] * VeniPartWindow.x);
-  }  
+  } 
+  
+  calculateId {
+    ^offset[0] + (offset[1] * VeniPartWindow.x);
+  } 
 }             
 
 

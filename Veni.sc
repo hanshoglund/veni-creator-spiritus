@@ -68,6 +68,8 @@ Veni : Project {
     selectLenBus = Bus.control(server);
 
     field = Bus.audio(server, numChannels: 4);
+    
+    // Setup server and parts
 
     server.waitForBoot {
         parts = List[];
@@ -103,11 +105,11 @@ Veni : Project {
     
     // Create GUI
 
-    partWindow = VeniPartWindow.new.show;
-    bufferWindow = VeniBufferWindow.new.show;
+    partWindow = VeniPartWindow.new;
+    bufferWindow = VeniBufferWindow.new;
     
     
-    // Create midi responder
+    // Create MIDI responder
     
     midiResponder = CCResponder.new { |src, chan, num, val| 
       
@@ -146,6 +148,9 @@ Veni : Project {
         );        
       });
     };
+    
+    partWindow.show;
+    bufferWindow.show;
   }
 }
 

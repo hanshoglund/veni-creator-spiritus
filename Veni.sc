@@ -35,11 +35,11 @@ Veni : Project {
   var <midiResponder;
 
   /* Global control buses */
-  var densBus;
-  var durBus;
-  var rateBus;
-  var selectOffBus;
-  var selectLenBus;
+  var <densBus;
+  var <durBus;
+  var <rateBus;
+  var <selectOffBus;
+  var <selectLenBus;
 
   var partGroup;
   var outputGroup;
@@ -98,7 +98,7 @@ Veni : Project {
         outputGroup = Group.tail(server);
 
         SystemClock.sched(0.5, {
-          Synth.new(\test, target:partGroup);
+//          Synth.new(\test, target:partGroup);
           Synth.new(\decoder, target: outputGroup);
         });
     };
@@ -115,20 +115,41 @@ Veni : Project {
 
 //      [src, chan, num, val].postln;
 
-      // TODO update bus
+      switch(num,
+        41, {densBus.value = val / 127.0},
+        42, {durBus.value = val / 127.0},
+        43, {rateBus.value = val / 127.0},
 
+        94, {
+          if(val != 0, { this.play }, { this.stop });
+        },
+
+        21, {parts[0].gainBus.value = val / 127.0},
+        22, {parts[1].gainBus.value = val / 127.0},
+        23, {parts[2].gainBus.value = val / 127.0},
+        24, {parts[3].gainBus.value = val / 127.0},
+        25, {parts[4].gainBus.value = val / 127.0},
+        26, {parts[5].gainBus.value = val / 127.0},
+        27, {parts[6].gainBus.value = val / 127.0},
+        28, {parts[7].gainBus.value = val / 127.0},
+        31, {parts[0].feedbackBus.value = val / 127.0},
+        32, {parts[1].feedbackBus.value = val / 127.0},
+        33, {parts[2].feedbackBus.value = val / 127.0},
+        34, {parts[3].feedbackBus.value = val / 127.0},
+        35, {parts[4].feedbackBus.value = val / 127.0},
+        36, {parts[5].feedbackBus.value = val / 127.0},
+        37, {parts[6].feedbackBus.value = val / 127.0},
+        38, {parts[7].feedbackBus.value = val / 127.0}
+      );
 
       AppClock.sched(0, {
         switch(num,
-          // dens, dur, rate
           41, {bufferWindow.dens.value = val / 127.0},
           42, {bufferWindow.dur.value = val / 127.0},
           43, {bufferWindow.rate.value = val / 127.0},
 
-          // play button
           94, {bufferWindow.play.value = val / 127},
 
-          // pos widgets
           21, {partWindow.widgets[0].gain.value = val / 127.0},
           22, {partWindow.widgets[1].gain.value = val / 127.0},
           23, {partWindow.widgets[2].gain.value = val / 127.0},
@@ -151,6 +172,18 @@ Veni : Project {
 
     partWindow.show;
     bufferWindow.show;
+  }
+  
+  play {     
+"play".postln;
+    parts.collect(_.play);   
+    ^this;
+  } 
+  
+  stop {
+"stop".postln;
+    parts.collect(_.stop);
+    ^this;
   }
 }
 
@@ -178,11 +211,20 @@ VeniPart {
     gainBus     = Bus.control(veni.server);
     feedbackBus = Bus.control(veni.server);
 
-//    granulator = TGrains
+//    player = TGrains
 //    filter = Klank
 //    panner = PanB2
 
     outputBus   = Bus.audio(veni.server);
+  }  
+  
+  play {
+    
+    
+  } 
+  
+  stop {
+    
   }
 
 }

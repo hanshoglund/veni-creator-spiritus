@@ -54,6 +54,17 @@ VeniPartWidget {
     pos      = Slider2D . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 15,  200, 200));
     gain     = Slider   . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 225, 200, 16));
     feedback = Slider   . new(window, Rect(offset[0] * 220 + 15, offset[1] * 260 + 245, 200, 16));
+  
+    pos.action = { |s|
+      this.part.xBus.value = s.x * (-2) + 1;
+      this.part.yBus.value = s.y * 2 - 1;
+    };
+    gain.action = { |s|
+      this.part.gainBus.value = s.value;
+    };
+    feedback.action = { |s|
+      this.part.feedbackBus.value = s.value;
+    };
   }
 
   calculateId {
@@ -104,13 +115,20 @@ VeniBufferWindow {
     sfv.waveColors = Color.new(0.0,0.8,1.0) ! 2;
     sfv.setSelectionColor(0, Color.new(0.2,0.6,0.8));
 
-    // TODO sfv actions
-    // TODO update actions
-//    dens.action = {|c| c.value.postln};
-//    dur.action  = {|c| c.value.postln};
-//    rate.action = {|c| c.value.postln};
-//    play.action = {|c| switch (c.value, 0, {}, 1, {})};
-
     play.states = [["Play"], ["Stop"]];
+
+    // TODO sfv actions
+    dens.action = {|c| 
+      veni.densBus.value = c.value;
+    };
+    dur.action  = {|c| 
+      veni.durBus.value = c.value;
+    };
+    rate.action = {|c| 
+      veni.rateBus.value = c.value;
+    };
+    play.action = { |c|
+      if(c.value != 0, { veni.play }, { veni.stop });
+    };
   }
 }

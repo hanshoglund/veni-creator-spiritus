@@ -41,8 +41,8 @@ Veni : Project {
   var <selectOffBus;
   var <selectLenBus;
 
-  var partGroup;
-  var outputGroup;
+  var <partGroup;
+  var <outputGroup;
 
   var <parts;
   var <field;
@@ -196,7 +196,8 @@ VeniPart {
   var <yBus;
   var <gainBus;
   var <feedbackBus;
-  
+       
+  var <synthDef;
   var synth;
 
   *new { |v|
@@ -209,20 +210,41 @@ VeniPart {
     yBus        = Bus.control(veni.server);
     gainBus     = Bus.control(veni.server);
     feedbackBus = Bus.control(veni.server);
+    synthDef    = this.makeSynthGraph;    
+    synthDef.add.send(veni.server);
+  }                 
 
-//    player = TGrains
-//    filter = Klank
-//    panner = PanB2
-
-  }  
+  
+  makeSynthGraph {
+    var player = TGrains.ar(
+    	numChannels: 2, 
+    	bufnum:      veni.buffer, 
+    	trigger:     LFNoise1.kr(0.005 * veni.densBus.kr),
+    	centerPos:   WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
+    	dur:         veni.durBus.kr + 1.5 * 10,
+    	rate:        1.0 // TODO
+    );
+    
+    var panner = BFEncode2.ar(
+      player[0], 
+      xBus.kr, 
+      yBus.kr, 
+      0, 
+      0.7
+    );
+//player.postln;
+//panner.postln; 
+    ^{Out.ar(veni.field, panner)}.asSynthDef;
+  }
+  
   
   play {
 this.postln;
-    
+    synth = Synth.new(synthDef.name, target: veni.partGroup);
   } 
   
   stop {
-    
+    synth.free;
   }
 
 }

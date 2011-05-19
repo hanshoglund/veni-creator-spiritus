@@ -50,7 +50,7 @@ Veni : Project {
   /* GUI */
   var <partWindow;
   var <bufferWindow;
-  
+
   var playing = false;
 
 
@@ -74,7 +74,7 @@ Veni : Project {
         buffer = Buffer.read(server, path: fileName);
 
         parts = List[];
-        numParts.do { 
+        numParts.do {
           parts.add(VeniPart.new(this))
         };
 
@@ -171,17 +171,17 @@ Veni : Project {
     partWindow.show;
     bufferWindow.show;
   }
-  
-  play {     
-    if (playing == false) { 
-      parts.collect(_.play) 
+
+  play {
+    if (playing == false) {
+      parts.collect(_.play)
     };
     playing = true;
     ^this;
-  } 
-  
+  }
+
   stop {
-    if (playing == true) { 
+    if (playing == true) {
       parts.collect(_.stop);
     };
     playing = false;
@@ -190,7 +190,7 @@ Veni : Project {
 }
 
 VeniPart {
-          
+
   var veni;
 
   /* Part-specific control buses */
@@ -198,7 +198,7 @@ VeniPart {
   var <yBus;
   var <gainBus;
   var <feedbackBus;
-       
+
   var <synthDef;
   var synth;
 
@@ -212,46 +212,35 @@ VeniPart {
     yBus        = Bus.control(veni.server);
     gainBus     = Bus.control(veni.server);
     feedbackBus = Bus.control(veni.server);
-    synthDef    = this.makeSynthGraph;    
+
+    synthDef    = {
+      var player = TGrains.ar(
+        	2,
+        	bufnum:    veni.buffer,
+        	trigger:   LFNoise1.kr(4 * veni.densBus.kr + 0.05),
+        	centerPos: WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
+        	dur:       (veni.durBus.kr * 10) + 0.2,
+        	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
+        );
+        var panner = BFEncode2.ar(
+          player[0],
+          xBus.kr,
+          yBus.kr,
+          0,
+          0.7
+        );
+//      Out.ar(2, player)
+      Out.ar(veni.field, panner)
+    }.asSynthDef;
+
     synthDef.add.send(veni.server);
-  }                 
-
-  
-  makeSynthGraph {
-/*    var player = TGrains.ar(
-      numChannels: 2, 
-      bufnum:      veni.buffer, 
-      trigger:     LFNoise1.kr(0.5 * veni.densBus.kr),
-      centerPos:   WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
-      dur:         veni.durBus.kr + 1.5 * 10,
-      rate:        1.0 // TODO
-    );      
-        
-    var panner = BFEncode2.ar(
-      player[0], 
-      xBus.kr, 
-      yBus.kr, 
-      0, 
-      0.7
-    );  
-*/
-
-    ^{Out.ar(2, TGrains.ar(
-    	2, 
-    	bufnum:    veni.buffer, 
-    	trigger:   LFNoise1.kr(4 * veni.densBus.kr),
-    	centerPos: WhiteNoise.kr * veni.selectLenBus.kr + veni.selectOffBus.kr,
-    	dur:       4,
-    	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
-    ))}.asSynthDef;
-/*    ^{Out.ar(veni.field, panner)}.asSynthDef;*/
   }
-  
-  
+
+
   play {
     synth = Synth.new(synthDef.name, target: veni.partGroup);
-  } 
-  
+  }
+
   stop {
     synth.free;
   }

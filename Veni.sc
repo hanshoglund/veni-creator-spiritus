@@ -50,6 +50,8 @@ Veni : Project {
   /* GUI */
   var <partWindow;
   var <bufferWindow;
+  
+  var playing = false;
 
 
   init {
@@ -175,14 +177,20 @@ Veni : Project {
   }
   
   play {     
-"play".postln;
-    parts.collect(_.play);   
+    if (playing == false) { 
+      "play".postln;
+      parts.collect(_.play) 
+    };
+    playing = true;
     ^this;
   } 
   
   stop {
-"stop".postln;
-    parts.collect(_.stop);
+    if (playing == true) { 
+      "stop".postln;
+      parts.collect(_.stop);
+    };
+    playing = false;
     ^this;
   }
 }

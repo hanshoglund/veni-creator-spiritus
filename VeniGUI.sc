@@ -117,7 +117,11 @@ VeniBufferWindow {
 
     play.states = [["Play"], ["Stop"]];
 
-    // TODO sfv actions
+    sfv.action = {|c|
+      var range = c.selections[0].collect(_/veni.file.sampleRate);
+      veni.selectOffBus.value = range[0];
+      veni.selectLenBus.value = range[1];
+    };
     dens.action = {|c| 
       veni.densBus.value = c.value;
     };

@@ -222,18 +222,28 @@ VeniPart {
         	dur:       (veni.durBus.kr * 10) + 0.2,
         	rate:      (veni.rateBus.kr * 0.2 - 0.1) + 1 // must be subtle...
         );                                  
+      
+      var feedback = {  
+        var w, x, y, z;
+        #w, x, y, z = InFeedback.ar(veni.field, 4);
+        DecodeB2.ar(1, w, x, y);
+      }.value;        
+
+/*      var filteredFeedback = 
+        Klang.ar(
+          Ref([[20+200.rand, 200+2000.rand, 2000+7000.rand], 0.5!3, 20.rand!3]), 
+          feedback);  */
         
+      var signal = (player[0] * gainBus.kr) 
+        + (feedback * 0.2 * feedbackBus.kr);
         
-        
-        var signal = player[0] * gainBus.kr;
-        
-        var panner = BFEncode2.ar(
-          signal,
-          xBus.kr,
-          yBus.kr,
-          0,
-          0.7
-        );
+      var panner = BFEncode2.ar(
+        signal,
+        xBus.kr,
+        yBus.kr,
+        0,
+        0.7
+      );  
 //      Out.ar(2, player)
       Out.ar(veni.field, panner)
     }.asSynthDef;

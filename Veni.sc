@@ -179,7 +179,6 @@ Veni : Project {
       parts.collect(_.play)
     };
     playing = true;
-    ^this;
   }
 
   stop {
@@ -187,7 +186,6 @@ Veni : Project {
       parts.collect(_.stop);
     };
     playing = false;
-    ^this;
   }
 }
 

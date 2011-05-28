@@ -24,15 +24,15 @@ Veni : Project {
   /* Setup */
   classvar <fileName     = "/Users/hans/Documents/Media/Projects/Veni/veniMono.wav";
   classvar <numParts     = 8;
-  classvar <outputOffset = 2;
-  classvar <numSpeakers  = 6;
-  classvar <speakerDistance = 2.3;
-
+  classvar <outputOffset = 17;
+  classvar <numSpeakers  = 8;
+  classvar <speakerDistance = 11;
+  classvar <feedbackAmount = 0.6;
 
   var <server;
   var <file;
   var <buffer;
-  var <midiResponder;
+  var <midiResponder; 
 
   /* Global control buses */
   var <densBus;
@@ -104,7 +104,7 @@ Veni : Project {
 
         // TODO should be sent lazily on the first play instead
         SystemClock.sched(0.5, {
-//          Synth.new(\test, target:partGroup);
+          //Synth.new(\test, target:partGroup);
           Synth.new(\decoder, target: outputGroup);
         });
     };
@@ -231,7 +231,7 @@ VeniPart {
       var filteredFeedback = HPF.ar(LPF.ar(feedback, 500), 100);
           
       var signal = (player[0] * gainBus.kr) 
-        + (filteredFeedback * feedbackBus.kr * 0.2);
+        + (filteredFeedback * feedbackBus.kr * Veni.feedbackAmount);
         
       var panner = BFEncode2.ar(
         signal,
